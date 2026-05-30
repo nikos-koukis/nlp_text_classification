@@ -1,6 +1,10 @@
 import pandas as pd
 import torch
 from sentence_transformers import SentenceTransformer
+import logging
+
+# Module logger
+logger = logging.getLogger(__name__)
 
 def process_data_for_pipeline(df, text_col, label_col):
     """
@@ -14,14 +18,14 @@ def process_data_for_pipeline(df, text_col, label_col):
     model = SentenceTransformer('BAAI/bge-m3', device=device)
     model.max_seq_length = 8192
     
-    print(f"Generating embeddings using {device}...")
+    logger.info(f"Generating embeddings using {device}...")
     emb = model.encode(
         df[text_col].tolist(),
         batch_size=32,
         show_progress_bar=True,
         normalize_embeddings=True,
     )
-    print("Embeddings shape:", emb.shape)
+    logger.info("Embeddings shape: %s", emb.shape)
     
     feature_names = [f"feat_{i}" for i in range(emb.shape[1])]
     pipeline_df = pd.DataFrame(emb, columns=feature_names)

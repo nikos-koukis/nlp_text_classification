@@ -20,7 +20,7 @@ def evaluate_saved_model(X_test, y_test, model_path=None):
             f"No saved model found at '{model_path}'. "
         )
         
-    print(f"Loading saved model from: {model_path}...")
+    print(f"Loading saved model")
     model = joblib.load(model_path)
     
     #Generate predictions on test data

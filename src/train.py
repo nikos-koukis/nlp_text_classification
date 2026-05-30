@@ -8,6 +8,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 import os
 import joblib
+import logging
+
+# Module logger
+logger = logging.getLogger(__name__)
 
 def prepare_data(df, test_size=0.2, random_state=42):
     """
@@ -66,12 +70,12 @@ def evaluate_model_pool(X_train, y_train, cv_folds=5, scoring='f1', random_state
     models = get_model_pool(random_state)
     cv_results = {}
     
-    print(f"--- Step 1: Running Baseline {cv_folds}-Fold Cross-Validation ({scoring}) ---")
+    logger.info(f"--- Step 1: Running Baseline {cv_folds}-Fold Cross-Validation ({scoring}) ---")
     for name, model in models.items():
         scores = cross_val_score(model, X_train, y_train, cv=cv_folds, scoring=scoring, n_jobs=-1)
         mean_score = np.mean(scores)
         cv_results[name] = mean_score
-        print(f"{name}: Baseline Mean {scoring} = {mean_score:.4f}")
+        logger.info(f"{name}: Baseline Mean {scoring} = {mean_score:.4f}")
         
     return cv_results, models
 
@@ -81,14 +85,14 @@ def train_and_save_best_model(best_model_name, best_model_blueprint, X_train, y_
     Takes the winner, performs hyperparameter tuning via GridSearchCV, 
     extracts the absolute best version, and saves it.
     """
-    print(f"\n--- Step 2: Hyperparameter Tuning for Winner ({best_model_name}) ---")
+    logger.info(f"\n--- Step 2: Hyperparameter Tuning for Winner ({best_model_name}) ---")
     
     # Get the hyperparameter grid specific to the winning model
     param_grids = get_hyperparameter_grids()
     param_grid = param_grids.get(best_model_name, {})
     
     if param_grid:
-        print(f"Running GridSearchCV over search space: {param_grid}")
+        logger.info(f"Running GridSearchCV over search space: {param_grid}")
         grid_search = GridSearchCV(
             estimator=best_model_blueprint,
             param_grid=param_grid,
@@ -101,10 +105,10 @@ def train_and_save_best_model(best_model_name, best_model_blueprint, X_train, y_
         
         # Extract the tuned model configuration
         final_model = grid_search.best_estimator_
-        print(f"Tuning Complete! Best Params: {grid_search.best_params_}")
-        print(f"Optimized Training {scoring} Score: {grid_search.best_score_:.4f}")
+        logger.info(f"Tuning Complete! Best Params: {grid_search.best_params_}")
+        logger.info(f"Optimized Training {scoring} Score: {grid_search.best_score_:.4f}")
     else:
-        print(f"No param grid found for {best_model_name}. Training with default parameters...")
+        logger.info(f"No param grid found for {best_model_name}. Training with default parameters...")
         final_model = best_model_blueprint
         final_model.fit(X_train, y_train)
     
@@ -116,7 +120,7 @@ def train_and_save_best_model(best_model_name, best_model_blueprint, X_train, y_
     os.makedirs(model_dir, exist_ok=True)
     model_path = os.path.join(model_dir, 'best_model.joblib')
     joblib.dump(final_model, model_path, compress=3)
-    print(f"Successfully saved compressed model pipeline to: {model_path}") 
+    logger.info(f"Successfully saved compressed model pipeline to: {model_path}") 
     
     return final_model
 
@@ -129,7 +133,7 @@ def find_and_train_best_model(X_train, y_train, cv_folds=5, scoring='f1', random
     #Select the top-performing model 
     best_model_name = max(cv_results, key=cv_results.get)
     best_model_blueprint = models[best_model_name]
-    print(f"\nWinner Selected: {best_model_name} is moving to the tuning phase.")
+    logger.info(f"\nWinner Selected: {best_model_name} is moving to the tuning phase.")
     
     #Fine-tune the winner model
     final_model = train_and_save_best_model(
