@@ -24,6 +24,7 @@ serialized to disk, and scored on a held-out test set.
 5. [Key Findings](#5-key-findings)
 6. [How to Run](#6-how-to-run)
 7. [Why It Works & Where It Goes Next](#7-why-it-works--where-it-goes-next)
+8. [Contributors](#8-contributors)
 
 ---
 
@@ -124,29 +125,36 @@ where strong regularization curbs overfitting.
 ### 3.3 Held-out test metrics (80/20 stratified split)
 
 The evaluator ([`evaluate_saved_model`](src/evaluate.py)) prints an F1 score, a full
-`classification_report`, and a confusion matrix. The report layout is:
+`classification_report`, and a confusion matrix. On the untouched 400-row test split the
+model scores a **perfect F1 of 1.00**:
+
+![Classification report](notebooks/image.png)
 
 ```
+Classification_Report
               precision    recall  f1-score   support
-   Human (0)       …          …        …         ~267
-      AI (1)       …          …        …         ~133
+   Human (0)       1.00       1.00      1.00       267
+      AI (1)       1.00       1.00      1.00       133
 
-Confusion matrix:
-                 Pred Human   Pred AI
- True Human         TN          FP
- True AI            FN          TP
+    accuracy                            1.00       400
+   macro avg       1.00       1.00      1.00       400
+weighted avg       1.00       1.00      1.00       400
+
+Confusion Matrix:
+ [[267   0]
+  [  0 133]]
 ```
 
-| Quadrant | Meaning |
-|----------|---------|
-| `matrix[0][0]` — **TN** | True humans correctly flagged human |
-| `matrix[0][1]` — **FP** | True humans wrongly flagged AI |
-| `matrix[1][0]` — **FN** | True AI wrongly flagged human |
-| `matrix[1][1]` — **TP** | True AI correctly caught |
+| Quadrant | Count | Meaning |
+|----------|------:|---------|
+| `matrix[0][0]` — **TN** | **267** | True humans correctly flagged human |
+| `matrix[0][1]` — **FP** | **0** | True humans wrongly flagged AI |
+| `matrix[1][0]` — **FN** | **0** | True AI wrongly flagged human |
+| `matrix[1][1]` — **TP** | **133** | True AI correctly caught |
 
-> The model separates the two classes **very well** — see
-> [Section 7](#7-why-it-works--where-it-goes-next) for why. Run the pipeline to print the
-> exact F1 / precision / recall on your machine.
+> **Zero misclassifications** on the 400-text holdout — every human and every AI text is
+> identified correctly. See [Section 7](#7-why-it-works--where-it-goes-next) for why the
+> two classes separate so cleanly.
 
 ---
 
@@ -282,3 +290,11 @@ It works very good because those models use a specific method of writing using a
 word counts and punctuation density trying to mimic human writing. In future AI models
 (GPT 5, Gemini 3.5) a DistillBERT Transformer that understands the semantic context and the
 fundamental 'vibe' of AI vs Human text will be much better.
+
+---
+
+## 8. Contributors
+
+- [@mpapachrys](https://github.com/mpapachrys)
+- [@DimitrisPapachrysanthou](https://github.com/DimitrisPapachrysanthou)
+- [@dimitrisgalanisun-art](https://github.com/dimitrisgalanisun-art)
