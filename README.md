@@ -130,21 +130,6 @@ model scores a **perfect F1 of 1.00**:
 
 ![Classification report](notebooks/image.png)
 
-```
-Classification_Report
-              precision    recall  f1-score   support
-   Human (0)       1.00       1.00      1.00       267
-      AI (1)       1.00       1.00      1.00       133
-
-    accuracy                            1.00       400
-   macro avg       1.00       1.00      1.00       400
-weighted avg       1.00       1.00      1.00       400
-
-Confusion Matrix:
- [[267   0]
-  [  0 133]]
-```
-
 | Quadrant | Count | Meaning |
 |----------|------:|---------|
 | `matrix[0][0]` — **TN** | **267** | True humans correctly flagged human |
