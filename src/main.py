@@ -5,7 +5,6 @@ from nlp import process_data_for_pipeline
 from train import prepare_data, find_and_train_best_model
 from evaluate import evaluate_saved_model
 
-
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
